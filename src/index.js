@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Markdown from 'remarkable';
+import toc from 'markdown-toc';
 
 var Remarkable = React.createClass({
 
@@ -47,8 +48,13 @@ var Remarkable = React.createClass({
   renderMarkdown(source) {
     if (!this.md) {
       this.md = new Markdown(this.props.options);
+      this.md.renderer.rules.heading_open = function (tokens, idx /*, options, env */) {
+        return '<a name="#' + toc.slugify(tokens[idx+1].content) + '"><h' + tokens[idx].hLevel + '>';
+      }
+      this.md.renderer.rules.heading_close = function (tokens, idx /*, options, env */) {
+        return '</h' + tokens[idx].hLevel + '></a>\n';
+      }
     }
-
     return this.md.render(source);
   }
 
